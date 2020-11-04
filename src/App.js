@@ -138,6 +138,13 @@ const App = () => {
     }
   }
 
+  const merrImage = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      var image = e.target.files[0];
+      setImages(image);
+    }    
+  }
+
   const submit = async() => {
     var finalgroups = [];
     for(let i=0; i < groups.length; i++){
@@ -154,6 +161,7 @@ const App = () => {
     console.log("users: " + finalusers);
     console.log("groups: " + finalgroups);
     console.log("category: " + finalcategory);
+    console.log(images);
     let apicall = await fetch("http://localhost:5000/api/createNews",{
       method: "post",
       headers: {'Content-Type':'application/json'},
@@ -220,7 +228,7 @@ const App = () => {
         <h5>Headline</h5>
         <input className="Inputi" type="text" value={headline} onChange={(e) => setHeadline(e.target.value)} placeholder="Headline"/>
         <h5>Images</h5>
-        <input className="Inputi" type="text" value={images} onChange={(e) => setImages(e.target.value)} placeholder="Images"/>
+        <input className="Inputi" type="file" accept="image/*" onChange={(e) => merrImage(e)} placeholder="Images"/>
         <h5>Attachment</h5>
         <input className="Inputi" type="text" value={attachment} onChange={(e) => setAttachment(e.target.value)} placeholder="Attachment"/>
         <h5>Category</h5>
