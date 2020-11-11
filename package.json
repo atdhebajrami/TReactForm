@@ -8,6 +8,7 @@
     "@testing-library/user-event": "^12.1.10",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "react-dropdown": "^1.9.0",
     "react-multi-select-component": "^3.0.4",
     "react-multiple-select-dropdown": "^3.0.0",
     "react-scripts": "4.0.0",
