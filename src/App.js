@@ -305,6 +305,10 @@ const App = () => {
     for(let i=0; i < eventusers.length; i++){
       finalusers.push(eventusers[i].value);
     }
+    var datefrom = date_from + "T" + time_from;
+    var dateto = date_to + "T" + time_until;
+    console.log("datefrom: " + datefrom);
+    console.log("dateto: " + dateto);
     console.log("eventusers: " + finalusers);
     console.log("eventgroups: " + finalgroups);
     console.log("official_club_date: " + official_club_date);
@@ -317,10 +321,8 @@ const App = () => {
         "type": eventType,
         "name": name,
         "picture_video": picture_video,
-        "date_from": date_from,
-        "date_to": date_to,
-        "time_from": time_from,
-        "time_until": time_until,
+        "date_from": datefrom,
+        "date_to": dateto,
         "place": place,
         "room": room,
         "visibility": visibility,
