@@ -85,7 +85,7 @@ const App = () => {
     <div className="App">
       <CreateNews team_id={team_id} ableUsers={ableUsers} ableGroups={ableGroups} ableCategory={ableCategory} />
 
-      <CreateEvents eventableUsers={eventableUsers} eventableGroups={eventableGroups} />
+      <CreateEvents team_id={team_id} eventableUsers={eventableUsers} eventableGroups={eventableGroups} />
     </div>
   );
 }

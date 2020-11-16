@@ -6,7 +6,9 @@ import 'react-dropdown/style.css';
 
 import MultiSelect from "react-multi-select-component";
 
-const CreateEvents = ({ eventableUsers, eventableGroups }) => {
+const CreateEvents = ({ team_id, /*eventableUsers,*/ eventableGroups }) => {
+
+  const [eventableUsers, setEventAbleUsers] = useState([]);
 
   const [role, setRole] = useState("");
   const [schedule, setSchedule] = useState("");
@@ -38,6 +40,8 @@ const CreateEvents = ({ eventableUsers, eventableGroups }) => {
   const [eventableAudience, setEventAbleAudience] = useState([]);
   const [eventselectedAudience, setEventSelectedAudience] = useState([]);
   const [eventshowAudienceDropdown, setEventShowAudienceDropdown] = useState(false);
+  const [showEventTypeDropdown, setShowEventTypeDropdown] = useState(false);
+  const [eventshowAudienceBox, setEventShowAudienceBox] = useState(false);
   const [eventsclicked, setEventsClicked] = useState(false);
   const [eventsText, setEventsText] = useState("");
 
@@ -94,9 +98,14 @@ const CreateEvents = ({ eventableUsers, eventableGroups }) => {
   const setRoleFunc = (v) => {
     setRole(v);
     if(v === "secretaries" || v === "functionaries" || v === "editor"){
-      setAbleEventTypes(["Club events", "Group events", "Functionary events", "Courses/Classes", "Seminars", "Work assignments"]);
+      setAbleEventTypes([{label:"Club events", value:"club-event"},
+                         {label:"Group events", value:"group-events"},
+                         {label:"Functionary events",value:"functionary-events"},
+                         {label:"Courses/Classes",value:"Courses/Classes"},
+                         {label:"Seminars",value:"seminars"},
+                         {label:"Work assignments",value:"work-assignments"}]);
     }else if(v === "admin"){
-      setAbleEventTypes(["Group events", "Courses/Classes"]);
+      setAbleEventTypes([{label:"Group events", value:"group-events"},{label:"Courses/Classes",value:"Courses/Classes"}]);
     }else{
       setAbleEventTypes([]);
     }
@@ -157,6 +166,44 @@ const CreateEvents = ({ eventableUsers, eventableGroups }) => {
     }
   }
 
+  const setEventTypeFunc = async (v) => {
+    setEventType(v);
+    var eventtype = null;
+    if(visibility === "Public" && v === "Courses/Classes"){
+      eventtype = "courses";
+    }else if(visibility === "Private" && v === "Courses/Classes"){
+      eventtype = "courses-non-public";
+    }else{
+      eventtype = v;
+    }
+    console.log("event type: " + eventtype);
+    let apicall = await fetch(`http://localhost:5000/api/eventusers/team/${team_id}/event/${eventtype}`,{
+      method: "get",
+      headers: {'Content-Type':'application/json'}
+    })
+    let response = await apicall.json();
+    var lista = [];
+    if(response !== null && response !== undefined){
+      for(let i=0; i < response.length; i++){
+        let ableuser = {
+          value: response[i].id,
+          label: response[i].username
+        }
+        lista.push(ableuser);
+      }
+      setEventAbleUsers(lista);
+      setEventAbleAudience(lista);
+      setEventShowAudienceBox(true);
+    }
+  }
+
+  const setVisibilityFunc = (v) => {
+    setVisibility(v);
+    setEventType("");
+    setEventShowAudienceBox(false);
+    setShowEventTypeDropdown(true);
+  }
+
   return (
       <div className="InputBox">
         <h4 className="CreateNews">Create Events</h4>
@@ -167,15 +214,30 @@ const CreateEvents = ({ eventableUsers, eventableGroups }) => {
         <h5>Official Club Date</h5>
         <Dropdown options={["Yes", "No"]} onChange={v => setOfficial_club_date(v.value)} value={official_club_date} placeholder="Is this official club date ?" />
         <div className="Space"></div>
-        <h5>Type of Event</h5>
-        <Dropdown options={ableEventTypes} onChange={v => setEventType(v.value)} value={eventType} placeholder="Select an event type" />
+        <h5>Visibility</h5>
+        <Dropdown options={["Public", "Private"]} onChange={v => setVisibilityFunc(v.value)} value={visibility} placeholder="Select Visibility" />
         <div className="Space"></div>
+        {
+          showEventTypeDropdown ?
+          <div>
+            <h5>Type of Event</h5>
+            <Dropdown options={ableEventTypes} onChange={v => setEventTypeFunc(v.value)} value={eventType} placeholder="Select an event type" />
+            <div className="Space"></div>
+          </div>
+          : null
+        }
         <h5>Name of Event</h5>
         <input className="Inputi" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Name of Event"/>
         <h5>Picture Video</h5>
         <input className="Inputi" type="text" value={picture_video} onChange={(e) => setPicture_video(e.target.value)} placeholder="Picture Video"/>
-        <h5>Audience</h5>
-        <input className="Inputi" type="text" value={eventaudience} onChange={(e) => getEventAudience(e.target.value)} placeholder="Audience"/>
+        {
+          eventshowAudienceBox ?
+          <div>
+            <h5>Audience</h5>
+            <input className="Inputi" type="text" value={eventaudience} onChange={(e) => getEventAudience(e.target.value)} placeholder="Audience"/>
+          </div>
+          : null
+        }
         {
           eventshowAudienceDropdown ?
           <div>
@@ -201,9 +263,6 @@ const CreateEvents = ({ eventableUsers, eventableGroups }) => {
         <input className="Inputi" type="text" value={place} onChange={(e) => setPlace(e.target.value)} placeholder="Place"/>
         <h5>Room</h5>
         <input className="Inputi" type="number" value={room} onChange={(e) => setRoom(e.target.value)} placeholder="Room"/>
-        <h5>Visibility</h5>
-        <Dropdown options={["Public", "Private"]} onChange={v => setVisibility(v.value)} value={visibility} placeholder="Select Visibility" />
-        <div className="Space"></div>
         <h5>Limitation of Participants</h5>
         <Dropdown options={["Yes", "No"]} onChange={v => setLimitation_of_participants(v.value)} value={limitation_of_participants} placeholder="Select Limitation of Participants" />
         <div className="Space"></div>
